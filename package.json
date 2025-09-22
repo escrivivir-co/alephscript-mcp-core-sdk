@@ -1,0 +1,33 @@
+{
+  "name": "@alephscript/mcp-core-sdk",
+  "version": "1.0.0",
+  "description": "As a superset of Typescript, AlephScript Core is a bunch of ts code to extend it (if it is possible) for specific FIA handling (over Socket.io)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./server": "./dist/server/index.js",
+    "./client": "./dist/client/index.js",
+    "./types": "./dist/types/index.js",
+    "./utils": "./dist/utils/index.js"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@socket.io/admin-ui": "^0.5.1",
+    "@types/socket.io": "^3.0.2",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5"
+  },
+  "peerDependencies": {
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5"
+  },
+  "license": "AIPLv1"
+}
