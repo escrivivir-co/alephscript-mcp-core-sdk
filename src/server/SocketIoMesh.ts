@@ -3,8 +3,8 @@ import { createServer } from 'node:http';
 import path from 'path';
 
 import cors from 'cors';
-import { AlephScriptClient } from '@alephscript/client';
-import { AlephScriptServer } from 'server/AlephScriptServer';
+import { AlephScriptClient } from '../client/AlephScriptClient';
+import { AlephScriptServer } from './AlephScriptServer';
 
 const PORT = 3010;
 export class SocketIoMesh {
@@ -28,10 +28,10 @@ export class SocketIoMesh {
 		// Servir el Socket.IO Admin UI - Usando require.resolve para encontrar el módulo correctamente
 		try {
 			const adminUIPath = path.dirname(require.resolve('@socket.io/admin-ui/package.json'));
-			const adminUIDistPath = path.join(adminUIPath, 'dist');
-			this.app.use('/admin', express.static(adminUIDistPath));
+			const adminUIDistPath = path.join(adminUIPath, 'ui', 'dist');
+			this.app.use('/ui', express.static(adminUIDistPath));
 			this.adminUIAvailable = true;
-			console.log('✅ Socket.IO Admin UI disponible en /admin');
+			console.log('✅ Socket.IO Admin UI disponible en /ui');
 		} catch (error) {
 			console.warn('⚠️  Socket.IO Admin UI no está disponible. Instala @socket.io/admin-ui para habilitarlo.');
 			this.adminUIAvailable = false;
