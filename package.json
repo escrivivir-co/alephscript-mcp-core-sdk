@@ -22,6 +22,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.4",
     "@socket.io/admin-ui": "^0.5.1",
     "@types/socket.io": "^3.0.2",
     "express": "^5.1.0",
