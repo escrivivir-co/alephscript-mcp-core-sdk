@@ -1,3 +1,18 @@
-node_modules
-dist
-*.tgztsconfig.tsbuildinfo
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+*.tgz
+tsconfig.tsbuildinfo
+
+# TypeScript compiled files in src/ (keep only .ts sources)
+src/**/*.js
+src/**/*.js.map
+src/**/*.d.ts
+src/**/*.d.ts.map
+
+# IDE
+.idea/
+*.swp
+.DS_Store

@@ -1,13 +1,24 @@
-# Integración con ALEPH Scriptorium
+# mcp-core-sdk — Integración con ALEPH Scriptorium
 
 > **Submódulo**: `mcp-core-sdk`  
-> **Padre directo**: NovelistEditor (no ALEPH raíz)  
+> **Padre directo**: MCPGallery  
+> **Consumidores**: mcp-mesh-sdk, NovelistEditor  
 > **Rama de integración**: `integration/beta/scriptorium`  
-> **Fecha**: 2025-12-28
+> **Versión**: 1.0.0  
+> **Fecha**: 2025-12-30
 
 ---
 
-## Arquitectura del Submódulo
+## 🎯 Propósito
+
+Biblioteca core que proporciona:
+- **BaseMCPServer**: Clase base para crear servidores MCP compatibles con `@modelcontextprotocol/sdk`
+- **AlephScriptServer**: Servidor WebSocket (Socket.IO) para comunicación real-time
+- **AlephScriptClient**: Cliente para tests y depuración
+
+---
+
+## 🏗️ Arquitectura del Submódulo
 
 ```
 mcp-core-sdk/
