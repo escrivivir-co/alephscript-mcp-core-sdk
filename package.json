@@ -5,11 +5,34 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./server": "./dist/server/index.js",
-    "./client": "./dist/client/index.js",
-    "./types": "./dist/types/index.js",
-    "./utils": "./dist/utils/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "default": "./dist/server/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "default": "./dist/client/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "default": "./dist/types/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "default": "./dist/utils/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "server": ["dist/server/index.d.ts"],
+      "client": ["dist/client/index.d.ts"],
+      "types": ["dist/types/index.d.ts"],
+      "utils": ["dist/utils/index.d.ts"]
+    }
   },
   "scripts": {
     "build": "tsc --build",
