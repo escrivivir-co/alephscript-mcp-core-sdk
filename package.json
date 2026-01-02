@@ -28,10 +28,18 @@
   },
   "typesVersions": {
     "*": {
-      "server": ["dist/server/index.d.ts"],
-      "client": ["dist/client/index.d.ts"],
-      "types": ["dist/types/index.d.ts"],
-      "utils": ["dist/utils/index.d.ts"]
+      "server": [
+        "dist/server/index.d.ts"
+      ],
+      "client": [
+        "dist/client/index.d.ts"
+      ],
+      "types": [
+        "dist/types/index.d.ts"
+      ],
+      "utils": [
+        "dist/utils/index.d.ts"
+      ]
     }
   },
   "scripts": {
@@ -45,7 +53,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
+    "@modelcontextprotocol/sdk": "^1.25.1",
     "@socket.io/admin-ui": "^0.5.1",
     "@types/socket.io": "^3.0.2",
     "express": "^5.1.0",
