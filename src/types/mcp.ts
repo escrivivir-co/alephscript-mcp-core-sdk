@@ -332,11 +332,33 @@ export interface MCPStats {
 export enum MCPEventType {
   SERVER_CONNECTED = 'server_connected',
   SERVER_DISCONNECTED = 'server_disconnected',
+  SERVER_RECONNECTED = 'server_reconnected',
   SERVER_ERROR = 'server_error',
+  SYNC_ERROR = 'sync_error',
   TOOL_EXECUTED = 'tool_executed',
   RESOURCE_RETRIEVED = 'resource_retrieved',
   PROMPT_RETRIEVED = 'prompt_retrieved',
   HEALTH_CHECK = 'health_check',
+}
+
+/**
+ * MCP Event payload - emitted by MCPClientPool and drivers
+ */
+export interface MCPEvent {
+  /** Type of event */
+  type: MCPEventType;
+  /** Action that triggered the event */
+  action: string;
+  /** Server ID where event occurred */
+  serverId: string;
+  /** Timestamp of the event */
+  timestamp: number;
+  /** Optional event data */
+  data?: unknown;
+  /** Error message if applicable */
+  error?: string;
+  /** Additional context */
+  context?: Record<string, unknown>;
 }
 
 /**

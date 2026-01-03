@@ -1,6 +1,6 @@
 {
   "name": "@alephscript/mcp-core-sdk",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "AlephScript Core SDK - Types and utilities for MCP ecosystem",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -3,6 +3,7 @@
  * Provides common functionality for all MCP clients using @modelcontextprotocol/sdk
  * 
  * This is the client counterpart to BaseMCPServer in the server module.
+ * Implements IMCPDriver interface for single-server use cases.
  * 
  * @module @alephscript/mcp-core-sdk/client/BaseMCPClient
  */
@@ -16,6 +17,7 @@ import type {
   MCPToolResult,
 } from "../types/mcp";
 import { createDefaultLogger } from "../types/mcp";
+import type { IMCPDriver, MCPServerTransportConfig } from "./IMCPDriver";
 
 // Re-export types for convenience
 export type { MCPLogger, BaseMCPClientConfig, MCPToolResult } from "../types/mcp";
@@ -23,14 +25,20 @@ export { createDefaultLogger } from "../types/mcp";
 
 /**
  * Base class for MCP clients with HTTP Streamable transport.
+ * Implements IMCPDriver for single-server use cases.
  * Extend this class to create domain-specific MCP clients (e.g., MCPPrologClient).
+ * 
+ * For multi-server scenarios, use MCPClientPool instead.
  */
-export class BaseMCPClient {
+export class BaseMCPClient implements Partial<IMCPDriver> {
   protected client: Client | null = null;
   protected transport: Transport | null = null;
   protected config: BaseMCPClientConfig;
   protected logger: MCPLogger;
   protected connected: boolean = false;
+  
+  /** Server config for IMCPDriver compatibility */
+  protected serverConfig: MCPServerTransportConfig | null = null;
 
   constructor(config: BaseMCPClientConfig, logger?: MCPLogger) {
     this.config = {
@@ -38,7 +46,98 @@ export class BaseMCPClient {
       ...config,
     };
     this.logger = logger || createDefaultLogger(`${config.name}: `);
+    
+    // Create server config from base config
+    this.serverConfig = {
+      id: config.name,
+      name: config.name,
+      url: config.serverUrl,
+      timeout: config.timeout,
+    };
   }
+
+  // ===== IMCPDriver: Server Management =====
+
+  /**
+   * Add/replace server configuration (single-server: replaces current)
+   */
+  addServer(config: MCPServerTransportConfig): void {
+    this.serverConfig = config;
+    this.config.serverUrl = config.url;
+    this.config.name = config.name;
+    this.logger.info(`Server configured: ${config.name} at ${config.url}`);
+  }
+
+  /**
+   * Remove server (single-server: disconnects and clears config)
+   */
+  async removeServer(serverId: string): Promise<boolean> {
+    if (this.serverConfig?.id === serverId) {
+      await this.disconnect();
+      this.serverConfig = null;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get all servers (single-server: returns array with one element)
+   */
+  getServers(): MCPServerTransportConfig[] {
+    return this.serverConfig ? [this.serverConfig] : [];
+  }
+
+  /**
+   * Get server by ID
+   */
+  getServer(serverId: string): MCPServerTransportConfig | undefined {
+    return this.serverConfig?.id === serverId ? this.serverConfig : undefined;
+  }
+
+  // ===== IMCPDriver: Core Operations =====
+
+  /**
+   * Execute a tool (IMCPDriver interface)
+   * @param serverId Ignored for single-server client
+   */
+  async executeTool(serverId: string, toolName: string, params: Record<string, unknown>): Promise<unknown> {
+    return this.callTool(toolName, params);
+  }
+
+  /**
+   * Get a resource (IMCPDriver interface)
+   * @param serverId Ignored for single-server client
+   */
+  async getResource(serverId: string, resourceId: string, params?: Record<string, unknown>): Promise<unknown> {
+    await this.ensureConnected();
+    
+    try {
+      const result = await this.client!.readResource({
+        uri: resourceId,
+      });
+      return result;
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`Resource read failed`, { resourceId, error: err.message });
+      throw err;
+    }
+  }
+
+  /**
+   * Health check (IMCPDriver interface)
+   */
+  async healthCheck(serverId: string): Promise<boolean> {
+    try {
+      await this.ensureConnected();
+      // Simple ping - list tools to verify connection
+      await this.client!.listTools();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // ===== Core Connection Methods =====
 
   /**
    * Connect to the MCP Server via HTTP Streamable Transport
@@ -82,6 +181,13 @@ export class BaseMCPClient {
     this.transport = null;
     this.connected = false;
     this.logger.info(`${this.config.name}: Disconnected`);
+  }
+
+  /**
+   * Alias for disconnect (IMCPDriver interface)
+   */
+  async close(): Promise<void> {
+    return this.disconnect();
   }
 
   /**
