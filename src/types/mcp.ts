@@ -117,7 +117,7 @@ export interface BaseMCPClientConfig {
 // ============================================
 
 /**
- * MCP Server capabilities
+ * MCP Server capabilities - boolean flags to enable/disable
  */
 export interface MCPServerCapabilities {
   tools?: boolean;
@@ -136,8 +136,11 @@ export interface MCPServerFeatures {
 
 /**
  * Base configuration for MCP servers
+ * Extended fields (id, script, etc.) are optional for compatibility with mesh-sdk
  */
 export interface BaseMCPServerConfig {
+  /** Unique server identifier (optional, defaults to name) */
+  id?: string;
   /** Server name */
   name: string;
   /** Server version */
@@ -146,10 +149,18 @@ export interface BaseMCPServerConfig {
   port: number;
   /** Server description */
   description?: string;
-  /** Enabled capabilities */
+  /** Server script path (for process management) */
+  script?: string;
+  /** Enabled capabilities (boolean flags) */
   capabilities?: MCPServerCapabilities;
   /** Server features */
   features?: MCPServerFeatures;
+  /** Auto-restart on failure */
+  autoRestart?: boolean;
+  /** Health check interval in ms */
+  healthCheckInterval?: number;
+  /** Base URL for the server */
+  url?: string;
 }
 
 // ============================================

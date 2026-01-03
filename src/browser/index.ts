@@ -54,9 +54,13 @@ export { PrologErrorType } from '../types/prolog';
 // MCP types
 export type {
   MCPEvent,
+  MCPLogger,
+  MCPServerCapabilities,
+  MCPServerFeatures,
+  BaseMCPServerConfig,
 } from '../types/mcp';
 
-export { MCPEventType } from '../types/mcp';
+export { MCPEventType, createDefaultLogger } from '../types/mcp';
 
 // Socket/Room types (interfaces only, no runtime)
 export type {
