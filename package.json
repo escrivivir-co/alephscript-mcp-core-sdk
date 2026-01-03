@@ -1,6 +1,6 @@
 {
   "name": "@alephscript/mcp-core-sdk",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "AlephScript Core SDK - Types and utilities for MCP ecosystem",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,6 +8,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser/index.d.ts",
+      "default": "./dist/browser/index.js"
     },
     "./server": {
       "types": "./dist/server/index.d.ts",
@@ -36,6 +40,9 @@
   },
   "typesVersions": {
     "*": {
+      "browser": [
+        "dist/browser/index.d.ts"
+      ],
       "server": [
         "dist/server/index.d.ts"
       ],
