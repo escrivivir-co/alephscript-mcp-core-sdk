@@ -7,3 +7,6 @@ export * from './ArgsMeta';
 export * from './IRoomDetails';
 export * from './INamespaceDetails';
 export * from './IServerState';
+
+// Prolog types for PrologEditor ecosystem
+export * from './prolog';

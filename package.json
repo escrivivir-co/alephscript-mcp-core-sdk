@@ -1,7 +1,7 @@
 {
   "name": "@alephscript/mcp-core-sdk",
-  "version": "1.0.0",
-  "description": "As a superset of Typescript, AlephScript Core is a bunch of ts code to extend it (if it is possible) for specific FIA handling (over Socket.io)",
+  "version": "1.0.1",
+  "description": "AlephScript Core SDK - Types and utilities for MCP ecosystem",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -21,6 +21,10 @@
       "types": "./dist/types/index.d.ts",
       "default": "./dist/types/index.js"
     },
+    "./types/prolog": {
+      "types": "./dist/types/prolog/index.d.ts",
+      "default": "./dist/types/prolog/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "default": "./dist/utils/index.js"
@@ -36,6 +40,9 @@
       ],
       "types": [
         "dist/types/index.d.ts"
+      ],
+      "types/prolog": [
+        "dist/types/prolog/index.d.ts"
       ],
       "utils": [
         "dist/utils/index.d.ts"
