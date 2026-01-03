@@ -10,27 +10,15 @@ import express from "express";
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { BaseMCPServerConfig } from "./MCPServerConfig";
+import { MCPLogger, createDefaultLogger } from "../types/mcp";
 
-
-/**
- * Logger interface for consistent logging across MCP servers
- */
-export interface MCPLogger {
-    info: (message: string, ...args: any[]) => void;
-    error: (message: string, ...args: any[]) => void;
-    debug: (message: string, ...args: any[]) => void;
-    verbose: (message: string, ...args: any[]) => void;
-}
+// Re-export MCPLogger for backwards compatibility
+export type { MCPLogger } from "../types/mcp";
 
 /**
  * Default logger implementation
  */
-const defaultLogger: MCPLogger = {
-    info: (message: string, ...args: any[]) => console.log(`[INFO] ${message}`, ...args),
-    error: (message: string, ...args: any[]) => console.error(`[ERROR] ${message}`, ...args),
-    debug: (message: string, ...args: any[]) => console.log(`[DEBUG] ${message}`, ...args),
-    verbose: (message: string, ...args: any[]) => console.log(`[VERBOSE] ${message}`, ...args),
-};
+const defaultLogger: MCPLogger = createDefaultLogger();
 
 /**
  * Abstract base class for MCP servers with HttpStreamable transport

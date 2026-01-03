@@ -1,11 +1,17 @@
 /**
  * MCP Server Configuration
+ * 
+ * Re-exports BaseMCPServerConfig from types/mcp for backwards compatibility.
+ * Local MCPServerConfig kept for mesh-specific extended fields.
  */
 
 import { MCPServerCapabilities } from "./MCPTypes";
 
+// Re-export from types/mcp
+export { BaseMCPServerConfig } from "../types/mcp";
+
 /**
- * Configuration for an MCP server connection
+ * Configuration for an MCP server connection (mesh-specific with extended fields)
  */
 export interface MCPServerConfig {
     /** Server port */
@@ -43,8 +49,4 @@ export interface MCPServerConfig {
     healthCheckInterval?: number;
     args?: string[];
     env?: Record<string, string>;
-}
-
-export interface BaseMCPServerConfig extends MCPServerConfig {
-
 }

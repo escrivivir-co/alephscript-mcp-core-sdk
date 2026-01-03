@@ -10,3 +10,6 @@ export * from './IServerState';
 
 // Prolog types for PrologEditor ecosystem
 export * from './prolog';
+
+// MCP types for client/server ecosystem
+export * from './mcp';

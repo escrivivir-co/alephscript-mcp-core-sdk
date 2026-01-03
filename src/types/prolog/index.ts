@@ -6,6 +6,9 @@
  * - PrologEditor/backend (REST API Gateway)
  * - PrologEditor/frontend (Angular UI)
  * 
+ * Note: PrologSession is the DTO (serializable) version.
+ * The runtime version with `engine: PrologEngine` lives in mcp-mesh-sdk.
+ * 
  * @module @alephscript/mcp-core-sdk/types/prolog
  */
 
@@ -14,7 +17,8 @@
 // ============================================
 
 /**
- * Prolog session identifier and metadata
+ * Prolog session DTO - serializable for API transport
+ * Does NOT include engine (that's runtime-only in mcp-mesh-sdk)
  */
 export interface PrologSession {
   sessionId: string;
@@ -22,6 +26,11 @@ export interface PrologSession {
   createdAt: string; // ISO date string
   lastUsedAt: string; // ISO date string
 }
+
+/**
+ * Alias for explicit naming
+ */
+export type PrologSessionDTO = PrologSession;
 
 /**
  * Request to create a new Prolog session

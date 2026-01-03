@@ -1,6 +1,6 @@
 {
   "name": "@alephscript/mcp-core-sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "AlephScript Core SDK - Types and utilities for MCP ecosystem",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,6 +25,10 @@
       "types": "./dist/types/prolog/index.d.ts",
       "default": "./dist/types/prolog/index.js"
     },
+    "./types/mcp": {
+      "types": "./dist/types/mcp.d.ts",
+      "default": "./dist/types/mcp.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "default": "./dist/utils/index.js"
@@ -43,6 +47,9 @@
       ],
       "types/prolog": [
         "dist/types/prolog/index.d.ts"
+      ],
+      "types/mcp": [
+        "dist/types/mcp.d.ts"
       ],
       "utils": [
         "dist/utils/index.d.ts"
