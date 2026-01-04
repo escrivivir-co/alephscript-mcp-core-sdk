@@ -33,6 +33,10 @@
       "types": "./dist/types/mcp.d.ts",
       "default": "./dist/types/mcp.js"
     },
+    "./types/typed-prompts": {
+      "types": "./dist/types/typed-prompts/index.d.ts",
+      "default": "./dist/types/typed-prompts/index.js"
+    },
     "./utils": {
       "types": "./dist/utils/index.d.ts",
       "default": "./dist/utils/index.js"
@@ -57,6 +61,9 @@
       ],
       "types/mcp": [
         "dist/types/mcp.d.ts"
+      ],
+      "types/typed-prompts": [
+        "dist/types/typed-prompts/index.d.ts"
       ],
       "utils": [
         "dist/utils/index.d.ts"

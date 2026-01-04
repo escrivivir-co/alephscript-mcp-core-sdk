@@ -13,3 +13,6 @@ export * from './prolog';
 
 // MCP types for client/server ecosystem
 export * from './mcp';
+
+// TypedPrompts types for TypedPromptsEditor ecosystem
+export * from './typed-prompts';
