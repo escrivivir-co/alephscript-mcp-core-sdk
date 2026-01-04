@@ -76,7 +76,6 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.1",
     "@socket.io/admin-ui": "^0.5.1",
-    "@types/socket.io": "^3.0.2",
     "express": "^5.1.0",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5"
