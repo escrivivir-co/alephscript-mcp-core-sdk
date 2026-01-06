@@ -8,6 +8,9 @@ export * from './IRoomDetails';
 export * from './INamespaceDetails';
 export * from './IServerState';
 
+// Browser/Client types for Angular, React, vanilla JS
+export * from './browser';
+
 // Prolog types for PrologEditor ecosystem
 export * from './prolog';
 
