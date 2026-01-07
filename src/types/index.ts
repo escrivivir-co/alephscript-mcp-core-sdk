@@ -8,6 +8,9 @@ export * from './IRoomDetails';
 export * from './INamespaceDetails';
 export * from './IServerState';
 
+// Room Protocol types for MASTER-ROOM communication
+export * from './room-protocol';
+
 // Prolog types for PrologEditor ecosystem
 export * from './prolog';
 
