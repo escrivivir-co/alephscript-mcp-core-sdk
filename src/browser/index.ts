@@ -99,6 +99,22 @@ export type {
   IServerState,
 } from '../types/IServerState';
 
+// Browser/Client types
+export type {
+  ConnectionStatus,
+  AlephClientConfig,
+  AlephMessage,
+  RoomMessage,
+  EventHandler,
+  ErrorHandler,
+  ConnectionHandler,
+  EventMap,
+  EventName,
+  GameAction,
+  AgentSelection,
+  HashOptions,
+} from '../types/browser';
+
 // ============================================
 // Isomorphic Utilities - Safe for browser
 // ============================================

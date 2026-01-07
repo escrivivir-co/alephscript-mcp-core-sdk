@@ -10,6 +10,8 @@ export * from './IServerState';
 
 // Room Protocol types for MASTER-ROOM communication
 export * from './room-protocol';
+// Browser/Client types for Angular, React, vanilla JS
+export * from './browser';
 
 // Prolog types for PrologEditor ecosystem
 export * from './prolog';
