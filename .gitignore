@@ -16,3 +16,4 @@ src/**/*.d.ts.map
 .idea/
 *.swp
 .DS_Store
+tsconfig.tsbuildinfo
