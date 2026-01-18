@@ -16,6 +16,9 @@ export * from './browser';
 // Prolog types for PrologEditor ecosystem
 export * from './prolog';
 
+// AAIA types for AAIAGallery ecosystem
+export * from './aaia';
+
 // MCP types for client/server ecosystem
 export * from './mcp';
 
