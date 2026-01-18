@@ -141,6 +141,19 @@ export type {
   IAppState,
   AAIARoomEvent,
   PersefonBotCapability,
+  // API Response types (AAIA-prefixed)
+  AAIACreateSessionResponse,
+  AAIAListSessionsResponse,
+  AAIAGetSessionResponse,
+  AAIADestroySessionResponse,
+  AAIAListFIAsResponse,
+  AAIAStepFIAResponse,
+  AAIAGetFIAStateResponse,
+  AAIASendPerceptoResponse,
+  AAIAGetMundoStateResponse,
+  AAIAQueryMundoResponse,
+  AAIAListAppsResponse,
+  AAIAErrorResponse,
 } from '../types/aaia';
 
 export { RunStateEnum } from '../types/aaia';

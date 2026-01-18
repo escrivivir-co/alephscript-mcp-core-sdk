@@ -311,6 +311,132 @@ export const DEFAULT_AAIA_MCP_SERVER_CONFIG = {
     botName: 'PersefonBot',
 };
 
+// ============================================
+// REST API Response Types (Backend HTTP API)
+// Prefixed with AAIA to avoid collision with Prolog types
+// ============================================
+
+/**
+ * Response for POST /api/sessions
+ */
+export interface AAIACreateSessionResponse {
+    success: boolean;
+    sessionId: string;
+    appId: string;
+    fiasCount: number;
+    error?: string;
+}
+
+/**
+ * Response for GET /api/sessions
+ */
+export interface AAIAListSessionsResponse {
+    success: boolean;
+    sessions: AAIASessionMeta[];
+    count: number;
+}
+
+/**
+ * Response for GET /api/sessions/:sessionId
+ */
+export interface AAIAGetSessionResponse {
+    success: boolean;
+    session: AAIASessionMeta;
+    fias: IFIAInfo[];
+    mundo: IMundoState;
+}
+
+/**
+ * Response for DELETE /api/sessions/:sessionId
+ */
+export interface AAIADestroySessionResponse {
+    success: boolean;
+    sessionId: string;
+    message: string;
+}
+
+/**
+ * Response for GET /api/sessions/:sessionId/fias
+ */
+export interface AAIAListFIAsResponse {
+    success: boolean;
+    sessionId: string;
+    fias: IFIAInfo[];
+    count: number;
+}
+
+/**
+ * Response for POST /api/sessions/:sessionId/fias/:fiaIndex/step
+ */
+export interface AAIAStepFIAResponse {
+    success: boolean;
+    fiaId: number;
+    eferencia?: IEferencia;
+    cycles?: number;
+    executionTimeMs?: number;
+}
+
+/**
+ * Response for GET /api/sessions/:sessionId/fias/:fiaIndex
+ */
+export interface AAIAGetFIAStateResponse {
+    success: boolean;
+    fiaId: number;
+    state: IFIAInfo;
+}
+
+/**
+ * Response for POST /api/sessions/:sessionId/percepto
+ */
+export interface AAIASendPerceptoResponse {
+    success: boolean;
+    processedBy: number[];
+    timestamp: string;
+}
+
+/**
+ * Response for GET /api/sessions/:sessionId/mundo
+ */
+export interface AAIAGetMundoStateResponse {
+    success: boolean;
+    sessionId: string;
+    mundo: IMundoState;
+}
+
+/**
+ * Response for POST /api/sessions/:sessionId/mundo/query
+ */
+export interface AAIAQueryMundoResponse {
+    success: boolean;
+    sessionId: string;
+    result: Record<string, unknown>;
+}
+
+/**
+ * Response for GET /api/apps
+ */
+export interface AAIAListAppsResponse {
+    success: boolean;
+    apps: Array<{
+        id: string;
+        nombre: string;
+        descripcion?: string;
+        paradigmaPrincipal: string;
+        fiasCount: number;
+    }>;
+    count: number;
+}
+
+/**
+ * Generic AAIA error response
+ */
+export interface AAIAErrorResponse {
+    error: string;
+    message?: string;
+    code?: string;
+    details?: Record<string, unknown>;
+}
+
 export default {
     RunStateEnum,
     DEFAULT_AAIA_MCP_SERVER_CONFIG,
