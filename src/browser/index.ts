@@ -115,6 +115,36 @@ export type {
   HashOptions,
 } from '../types/browser';
 
+// AAIA types (AAIAGallery ecosystem)
+export type {
+  FIAParadigma,
+  IPercepto,
+  IEferencia,
+  IFIAInfo,
+  IMundoState,
+  AAIASession,
+  AAIASessionMeta,
+  IAAIAApp,
+  IFIAConfig,
+  IMundoConfig,
+  AAIACreateSessionArgs,
+  AAIACreateSessionResult,
+  AAIAListFIAsArgs,
+  AAIAListFIAsResult,
+  AAIAStepFIAArgs,
+  AAIAStepFIAResult,
+  AAIASendPerceptoArgs,
+  AAIASendPerceptoResult,
+  // Frontend state types
+  IMenuState,
+  IRuntimeBlock,
+  IAppState,
+  AAIARoomEvent,
+  PersefonBotCapability,
+} from '../types/aaia';
+
+export { RunStateEnum } from '../types/aaia';
+
 // ============================================
 // Isomorphic Utilities - Safe for browser
 // ============================================

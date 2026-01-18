@@ -256,6 +256,42 @@ export interface AAIARoomEvent {
 }
 
 // ============================================
+// Frontend State Types (for Angular/React apps)
+// ============================================
+
+/**
+ * Menu state for FIA/Thread selection UI
+ * Used by ServerService.MenuAppsList$
+ */
+export interface IMenuState {
+    index: number;
+    name: string;
+    state: RunStateEnum;
+    mundo?: Partial<IMundoState>;
+    bots?: IFIAInfo[];
+}
+
+/**
+ * Runtime block state for execution chain
+ * Used by ServerService.chainState$
+ */
+export interface IRuntimeBlock {
+    id: string;
+    estado: Record<string, unknown>;
+    fecha: Date | string;
+}
+
+/**
+ * Application state for current app context
+ * Used by ServerService.appState$
+ */
+export interface IAppState {
+    index: number;
+    name: string;
+    fase?: string;
+}
+
+// ============================================
 // Default Config
 // ============================================
 
