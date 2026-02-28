@@ -2,22 +2,38 @@ import { IUserDetails } from "@alephscript/types";
 import { SocketClient } from "./SocketClient";
 
 export class AlephScriptClient extends SocketClient {
+
+  public room_name!: string;
+  public register_data!: IUserDetails;
+
   sus: string[] = [];
+
   disconnect() {
     this.sus = [];
     this.io.disconnect();
   }
+
   connect() {
+
     this.initTriggersDefinition.push(() => {
-      const ROOM_NAME = this.name + "_ROOM";
-      const REGISTER_PAYLOAD = {
-        usuario: this.name,
-        sesion: this.getHash("xS"),
-      };
-      this.io.emit("CLIENT_REGISTER", REGISTER_PAYLOAD as IUserDetails);
-      this.io.emit("CLIENT_SUSCRIBE", { room: ROOM_NAME });
-      this.room("MAKE_MASTER", { features: [] }, ROOM_NAME);
+
+      this.register(this.register_data);
+      this.subscribeRoom(this.room_name);
+      this.handleRoom([], this.room_name);
+
     });
+  }
+
+  subscribeRoom(ROOM_NAME?: string) {
+    this.io.emit("CLIENT_SUSCRIBE", { room: ROOM_NAME || this.room_name });
+  }
+
+  register(payload?: IUserDetails) {
+    this.io.emit("CLIENT_REGISTER", payload || this.register_data);
+  }
+
+  handleRoom(features?: string[], ROOM_NAME?: string) {
+    this.room("MAKE_MASTER", { features: features || [] }, ROOM_NAME || this.room_name);
   }
 
   run() {
@@ -85,5 +101,11 @@ export class AlephScriptClient extends SocketClient {
     public autoConnect = true
   ) {
     super(name, url, namespace, autoConnect);
+
+    this.room_name = this.name + "_ROOM";
+    this.register_data = {
+      usuario: this.name,
+      sesion: this.getHash("xS"),
+    };
   }
 }
