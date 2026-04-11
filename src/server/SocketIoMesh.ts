@@ -3,19 +3,41 @@ import { createServer } from 'node:http';
 import path from 'path';
 
 import cors from 'cors';
-import { AlephScriptClient } from '../client/AlephScriptClient';
 import { AlephScriptServer } from './AlephScriptServer';
+import { SocketServer } from './SocketServer';
 
-const PORT = 3010;
+/**
+ * SocketIoMesh - Base Mesh Layer
+ * 
+ * Crea y configura la infraestructura Express + Socket.IO:
+ * - Express app con CORS
+ * - Admin UI (si disponible)
+ * - AlephScriptServer (namespaces runtime/admin/base)
+ * - Ruta raíz informativa
+ * 
+ * Las subclases añaden lógica de orquestación (REST, capabilities, etc.)
+ * sin necesidad de recrear la infraestructura.
+ */
 export class SocketIoMesh {
 	app!: Application;
 	server: any;
 	as!: AlephScriptServer;
-	asCli!: AlephScriptClient;
-	noPath!: AlephScriptClient;
 	adminUIAvailable = false;
+	protected port: number = 3010;
 
-	async init(port: number = PORT) {
+	/**
+	 * Getter para acceder al SocketServer subyacente
+	 */
+	get socketServer(): SocketServer {
+		return this.as as SocketServer;
+	}
+
+	/**
+	 * Inicializa Express + Socket.IO server sin hacer listen().
+	 * Las subclases pueden override onSetup() para registrar endpoints adicionales.
+	 */
+	async init(port: number = this.port): Promise<void> {
+		this.port = port;
 		this.app = express();
 		const corsOptions = {
 			origin: (origin: any, callback: any) => {
@@ -24,8 +46,37 @@ export class SocketIoMesh {
 			credentials: true
 		};
 		this.app.use(cors(corsOptions));
+		this.app.use(express.json());
 
-		// Servir el Socket.IO Admin UI - Usando require.resolve para encontrar el módulo correctamente
+		this.setupAdminUI();
+		this.setupRootRoute();
+
+		this.server = createServer(this.app);
+		this.as = new AlephScriptServer(this.server);
+
+		// Hook para que subclases registren endpoints/listeners
+		this.onSetup();
+
+		this.server.listen(this.port, () => this.onServerStarted());
+	}
+
+	/**
+	 * Hook para subclases: se invoca después de crear app + server pero antes de listen.
+	 * Override este método para registrar endpoints REST, listeners, etc.
+	 */
+	protected onSetup(): void {
+		// Base: no-op. Subclases lo sobreescriben.
+	}
+
+	/**
+	 * Callback cuando el server arranca. Override para personalizar.
+	 */
+	protected onServerStarted(): void {
+		console.log(`🚀 SocketIoMesh - Server escuchando en el puerto ${this.port}`);
+		console.log("📦 Usando @alephscript/mcp-core-sdk");
+	}
+
+	private setupAdminUI(): void {
 		try {
 			const adminUIPath = path.dirname(require.resolve('@socket.io/admin-ui/package.json'));
 			const adminUIDistPath = path.join(adminUIPath, 'ui', 'dist');
@@ -36,9 +87,10 @@ export class SocketIoMesh {
 			console.warn('⚠️  Socket.IO Admin UI no está disponible. Instala @socket.io/admin-ui para habilitarlo.');
 			this.adminUIAvailable = false;
 		}
+	}
 
-		// Ruta raíz informativa
-		this.app.get('/', (req: Request, res: Response) => {
+	private setupRootRoute(): void {
+		this.app.get('/', (_req: Request, res: Response) => {
 			const response: any = {
 				message: 'AlephScript Socket.IO Server',
 				endpoints: {
@@ -58,38 +110,5 @@ export class SocketIoMesh {
 
 			res.json(response);
 		});
-
-		this.server = createServer(this.app);
-
-		this.as = new AlephScriptServer(this.server);
-
-		this.server.listen(PORT, this.onServerLog)
-	}
-
-	onServerLog() {
-		console.log(`🚀 Socket Gym Demo - Server escuchando en el puerto ${PORT}`);
-		console.log("📦 Usando @alephscript/core library");
-
-		// Crear clientes usando la librería
-		this.asCli = new AlephScriptClient("SERVER_cRUNTIME", `http://localhost:${PORT}`, "/runtime");
-		// THIS IS UI APP ADMIN DASHBOARD, DON'T CONNECT const asCliA = new AlephScriptClient("SERVER_cADMIN", `http://localhost:${PORT}`, "/admin");
-		this.noPath = new AlephScriptClient("SERVER_cNOPATH", `http://localhost:${PORT}`, "/");
-
-		// Configurar triggers usando la librería
-		this.asCli.initTriggersDefinition.push(() => {
-
-			this.asCli.io.on("SET_LIST_OF_THREADS", (...args: any[]) => {
-				console.log("📥 Receiving list of threads from @alephscript/core...")
-			})
-			this.asCli.room("GET_LIST_OF_THREADS");
-
-			this.asCli.io.on("SET_SERVER_STATE", (...args: any[]) => {
-				console.log("📊 Receiving server state from @alephscript/core...")
-			})
-			this.asCli.room("GET_SERVER_STATE");
-		})
-
-		console.log("✅ Demo aplicación configurada correctamente usando @alephscript/core");
-		// as.startPing();
 	}
 }
