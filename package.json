@@ -9,6 +9,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./vector-db": {
+      "types": "./dist/vector-db/index.d.ts",
+      "default": "./dist/vector-db/index.js"
+    },
     "./browser": {
       "types": "./dist/browser/index.d.ts",
       "default": "./dist/browser/index.js"
@@ -48,6 +52,9 @@
   },
   "typesVersions": {
     "*": {
+      "vector-db": [
+        "dist/vector-db/index.d.ts"
+      ],
       "browser": [
         "dist/browser/index.d.ts"
       ],
@@ -88,9 +95,11 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@chroma-core/default-embed": "^0.1.9",
     "@modelcontextprotocol/sdk": "^1.25.1",
     "@socket.io/admin-ui": "^0.5.1",
     "ajv": "^8.17.1",
+    "chromadb": "^3.4.3",
     "express": "^5.1.0",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
