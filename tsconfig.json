@@ -11,15 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true,
-    "ignoreDeprecations": "6.0",
-    "baseUrl": "./src",
-    "paths": {
-      "@alephscript/server": ["./server/index"],
-      "@alephscript/client": ["./client/index"],
-      "@alephscript/types": ["./types/index"],
-      "@alephscript/utils": ["./utils/index"]
-    }
+    "sourceMap": true
   },
   "include": [
     "src/**/*.ts"

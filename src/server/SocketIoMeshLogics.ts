@@ -66,7 +66,7 @@ export class SocketIoMeshLogics extends SocketIoMesh {
 
     protected override onServerStarted(): void {
         super.onServerStarted();
-        console.log(`🕸️  Mesh API disponible en http://localhost:${this.port}/mesh`);
+        console.log(`🕸️  Mesh API disponible en http://${this.getDisplayHost()}:${this.port}/mesh`);
     }
 
     /**

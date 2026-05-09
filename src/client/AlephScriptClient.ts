@@ -1,5 +1,5 @@
-import { IUserDetails } from "@alephscript/types";
-import { SocketClient } from "./SocketClient";
+import { IUserDetails } from "../types";
+import { SocketClient, SocketClientOptions } from "./SocketClient";
 
 export class AlephScriptClient extends SocketClient {
 
@@ -98,9 +98,9 @@ export class AlephScriptClient extends SocketClient {
     public name = "AlephClient",
     public url: string = "http://localhost:3000",
     public namespace: string = "/",
-    public autoConnect = true
+    optsOrAutoConnect: boolean | SocketClientOptions = true
   ) {
-    super(name, url, namespace, autoConnect);
+    super(name, url, namespace, optsOrAutoConnect);
 
     this.room_name = this.name + "_ROOM";
     this.register_data = {

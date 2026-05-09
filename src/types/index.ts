@@ -7,6 +7,7 @@ export * from './ArgsMeta';
 export * from './IRoomDetails';
 export * from './INamespaceDetails';
 export * from './IServerState';
+export * from './auth';
 
 // Room Protocol types for MASTER-ROOM communication
 export * from './room-protocol';

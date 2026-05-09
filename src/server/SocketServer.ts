@@ -1,9 +1,10 @@
 import http from "http";
-import { Socket, Server, Namespace } from 'socket.io';
+import { Socket, Server, Namespace, ServerOptions } from 'socket.io';
 import type { Server as HTTPSServer } from "https";
 import type { Http2SecureServer, Http2Server } from "http2";
 const { instrument } = require("@socket.io/admin-ui");
 import { isLogable, Message } from "../utils";
+import { AuthDecision, AuthValidator, HandshakeAuth } from "./auth/SharedSecretAuth";
 import { 
 	NamespaceDetails, 
 	RoomDetails, 
@@ -22,12 +23,49 @@ import {
 
 export type ServerInstance = http.Server | HTTPSServer | Http2SecureServer | Http2Server;
 
-const corsOptions = {
-    origin: (origin: any, callback: any) => {
-        callback(null, true);
-    },
-    credentials: true // Habilitar el soporte para credenciales
-};
+export interface SocketServerCorsOptions {
+	origins?: string[] | '*';
+	credentials?: boolean;
+}
+
+export interface SocketServerOptions {
+	activateInstrumens?: boolean;
+	autoBroadcast?: boolean;
+	cors?: SocketServerCorsOptions;
+	authValidator?: AuthValidator;
+}
+
+type SocketIoCorsOptions = NonNullable<ServerOptions['cors']>;
+
+function isSocketServerOptions(value: boolean | SocketServerOptions | undefined): value is SocketServerOptions {
+	return typeof value === 'object' && value !== null;
+}
+
+function createSocketIoCorsOptions(options?: SocketServerCorsOptions): SocketIoCorsOptions {
+	const credentials = options?.credentials ?? true;
+	const origins = options?.origins ?? '*';
+
+	if (origins === '*') {
+		return {
+			origin: (_origin, callback) => callback(null, true),
+			credentials
+		};
+	}
+
+	const allowedOrigins = new Set(origins.map((origin) => origin.trim()).filter(Boolean));
+
+	return {
+		origin: (origin, callback) => {
+			if (!origin || allowedOrigins.has(origin)) {
+				callback(null, true);
+				return;
+			}
+
+			callback(new Error(`origin not allowed: ${origin}`), false);
+		},
+		credentials
+	};
+}
 
 export class SocketServer {
 
@@ -37,28 +75,117 @@ export class SocketServer {
 	roomsSockets = new Map<roomId, socketId[]>();
 
 	io: Server;
+	autoBroadcast: boolean;
+	authValidator?: AuthValidator;
+	cors?: SocketServerCorsOptions;
 
 	constructor(
 		public name = "ASsrv",
 		server: ServerInstance,
-		activateInstrumens = true,
-		public autoBroadcast = true
+		activateInstrumensOrOptions: boolean | SocketServerOptions = true,
+		autoBroadcast = true
 	) {
+		const options = isSocketServerOptions(activateInstrumensOrOptions)
+			? activateInstrumensOrOptions
+			: {
+				activateInstrumens: activateInstrumensOrOptions,
+				autoBroadcast
+			};
 
-		this.io = new Server( server, { cors: corsOptions } );
+		this.autoBroadcast = options.autoBroadcast ?? true;
+		this.authValidator = options.authValidator;
+		this.cors = options.cors;
+
+		this.io = new Server(server, { cors: createSocketIoCorsOptions(this.cors) });
 
 		// Permite usar la aplicación Aleph-ws-server-ui para admin del server
-		if (activateInstrumens) {
+		if (options.activateInstrumens !== false && !this.authValidator) {
 			instrument(this.io, {
 				auth: false
 			});
+		} else if (options.activateInstrumens !== false && this.authValidator) {
+			this.log('SocketServer.instrumentation', 'Socket.IO Admin UI instrumentation disabled because authValidator is active');
 		}
 
 	}
 
+	private getNamespacePath(namespace: string): string {
+		return namespace ? `/${namespace}` : '/';
+	}
+
+	private getHandshakeAuth(socket: Socket): HandshakeAuth {
+		const auth = socket.handshake.auth;
+		if (auth && typeof auth === 'object' && !Array.isArray(auth)) {
+			return auth as HandshakeAuth;
+		}
+
+		return {};
+	}
+
+	private getAuthDecision(socket: Socket): AuthDecision | undefined {
+		return (socket.data as Record<string, unknown>).auth as AuthDecision | undefined;
+	}
+
+	private emitAuthError(socket: Socket, reason: string, room?: string, action?: string) {
+		socket.emit('auth_error', {
+			reason,
+			room,
+			action,
+			timestamp: new Date().toISOString()
+		});
+	}
+
+	private ensureRoomAllowed(namespace: string, socket: Socket, room: string | undefined, action: string): boolean {
+		if (!this.authValidator) {
+			return true;
+		}
+
+		const decision = this.getAuthDecision(socket);
+		if (!decision?.rooms || decision.rooms.length === 0) {
+			return true;
+		}
+
+		if (!room) {
+			const reason = 'room required';
+			this.log(`${namespace || '--'}.auth.reject`, reason);
+			this.emitAuthError(socket, reason, room, action);
+			return false;
+		}
+
+		if (decision.rooms.includes(room)) {
+			return true;
+		}
+
+		const reason = `room not allowed: ${room}`;
+		this.log(`${namespace || '--'}.auth.reject`, reason);
+		this.emitAuthError(socket, reason, room, action);
+		return false;
+	}
+
 	createNamespace(namespace: string) {
 
-		const socket = this.io.of('/' + namespace);
+		const socket = this.io.of(this.getNamespacePath(namespace));
+
+		if (this.authValidator) {
+			socket.use(async (clientSocket, next) => {
+				try {
+					const decision = await this.authValidator?.(namespace, this.getHandshakeAuth(clientSocket));
+					if (!decision?.ok) {
+						const reason = decision?.reason || 'unauthorized';
+						this.log(`${namespace || '--'}.auth.reject`, reason);
+						next(new Error(reason));
+						return;
+					}
+
+					(clientSocket.data as Record<string, unknown>).auth = decision;
+					next();
+				} catch (error) {
+					const reason = error instanceof Error ? error.message : String(error);
+					this.log(`${namespace || '--'}.auth.error`, reason);
+					next(new Error(reason || 'unauthorized'));
+				}
+			});
+		}
 
 		socket.on("connection", (socket) => this.onConnection(namespace, socket))
 
@@ -123,16 +250,25 @@ export class SocketServer {
 	}
 
 	onClientRegister(namespace: string, socket: Socket, args: IUserDetails) {
+		const authDecision = this.getAuthDecision(socket);
+		const payload = { ...args };
+
+		if (!payload.usuario && authDecision?.userId) {
+			payload.usuario = authDecision.userId;
+		}
 
 		this.log(namespace + ".onClientRegister: " +
-			"N/S [" + args.usuario + args.sesion + "][" + socket.id + "]");
+			"N/S [" + payload.usuario + payload.sesion + "][" + socket.id + "]");
 
-		args.name = args.usuario + args.sesion
-		this.sockets.set(socket.id, args as IUserDetails);
+		payload.name = payload.usuario + payload.sesion
+		this.sockets.set(socket.id, payload as IUserDetails);
 
 	}
 
 	onClientSuscribe(namespace: string, socket: Socket, args: SuscriptionDetails) {
+		if (!args.out && !this.ensureRoomAllowed(namespace, socket, args.room, 'subscribe')) {
+			return;
+		}
 
 		const message = namespace + ".onClientSuscribe." +
 		this.sockets.get(socket.id)?.name || "El socket no se ha registrado: " + socket.id;
@@ -174,6 +310,10 @@ export class SocketServer {
 
 		if (!args.room) {
 			this.log("Warning!!!! onRoomMessage. Missing room. Args", args)
+		}
+
+		if (!this.ensureRoomAllowed(namespace, socket, args.room, 'room_message')) {
+			return;
 		}
 
 		/*

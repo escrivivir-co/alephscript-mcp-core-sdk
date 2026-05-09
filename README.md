@@ -27,6 +27,59 @@ packages/
 
 ## Uso Básico
 
+## 1.4.0 — auth, bind host, healthz
+
+La versión `1.4.0` añade una capa mínima y backward-compatible para publicar meshes Socket.IO con auth de handshake, bind real explícito y health endpoint estable.
+
+### Servidor con `host`, `healthPath`, `cors` y `authValidator`
+
+```typescript
+import { SocketIoMeshLogics, makeSharedSecretValidator } from '@alephscript/mcp-core-sdk/server';
+
+const mesh = new SocketIoMeshLogics();
+
+await mesh.init({
+  port: 3010,
+  host: '0.0.0.0',
+  healthPath: '/healthz',
+  cors: {
+    origins: ['https://scriptorium.escrivivir.co'],
+    credentials: true
+  },
+  authValidator: makeSharedSecretValidator({
+    secrets: {
+      ROOMS_LAB: 'sek'
+    }
+  }),
+  exposeAdminUI: false
+});
+```
+
+### Cliente con `auth`
+
+```typescript
+import { SocketClient } from '@alephscript/mcp-core-sdk/client';
+
+const client = new SocketClient('ROOMS_CLIENT', 'http://127.0.0.1:3010', '/runtime', {
+  auth: {
+    token: 'sek',
+    room: 'ROOMS_LAB',
+    user: 'u1'
+  },
+  transports: ['websocket'],
+  reconnection: false
+});
+
+client.on('auth_error', (payload) => {
+  console.error('Auth error', payload);
+});
+```
+
+### Notas de superficie pública
+
+- `SocketClient` ahora extiende `EventEmitter` y reemite eventos como `connect_error`, `auth_error`, `reconnect` y `pong`.
+- Cuando el consumidor pasa `auth`, el bootstrap automático histórico (`CLIENT_REGISTER` + `CLIENT_SUSCRIBE` a `ENGINE_THREADS`) queda desactivado para no interferir con el flujo autenticado.
+
 ### Servidor
 
 ```typescript

@@ -1,5 +1,5 @@
 import { Namespace } from "socket.io";
-import { ServerInstance, SocketServer } from "./SocketServer";
+import { ServerInstance, SocketServer, SocketServerOptions } from "./SocketServer";
 
 export class AlephScriptServer extends SocketServer {
 
@@ -7,9 +7,9 @@ export class AlephScriptServer extends SocketServer {
 	admin: Namespace | undefined;
 	base: Namespace | undefined;
 
-	constructor(public server: ServerInstance) {
+	constructor(public server: ServerInstance, options?: SocketServerOptions) {
 
-		super("ASsrv", server);
+		super("ASsrv", server, options);
 
 		this.createNamespace("admin");
 		this.createNamespace("runtime");
