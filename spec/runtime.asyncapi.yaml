@@ -1,0 +1,76 @@
+asyncapi: '3.0.0'
+info:
+  title: Zeus Scriptorium Runtime
+  version: '1.0.0'
+  description: |
+    /runtime socket.io namespace — RABBIT/SPIDER/HORSE channels,
+    RNFP handshake (SM-A), IACM queue pre-initialized (SM-A),
+    MCP JSON-RPC envelope inside HORSE (SM-C).
+defaultContentType: application/json
+servers:
+  scriptorium:
+    host: localhost:3017
+    pathname: /runtime
+    protocol: socket.io
+channels:
+  runtime:
+    address: /runtime
+    messages:
+      RABBIT:
+        name: RABBIT
+        payload:
+          type: object
+          properties:
+            from: { type: string }
+            to: { type: string }
+            data: { type: object }
+      SPIDER:
+        name: SPIDER
+        payload:
+          type: object
+          properties:
+            from: { type: string }
+            to: { type: string }
+            data: { type: object }
+      HORSE:
+        name: HORSE
+        payload:
+          type: object
+          properties:
+            from: { type: string }
+            to: { type: string }
+            data: { type: object }
+      ROOM_MESSAGE:
+        name: ROOM_MESSAGE
+        payload:
+          type: object
+          properties:
+            event: { type: string }
+            room: { type: string }
+            data: { type: object }
+      CLIENT_REGISTER:
+        name: CLIENT_REGISTER
+      CLIENT_SUSCRIBE:
+        name: CLIENT_SUSCRIBE
+components:
+  schemas:
+    RnfpStates:
+      type: string
+      enum: ['idle', 'awaiting_accept', 'active']
+    IacmStates:
+      type: string
+      enum: ['idle', 'processing', 'awaiting_confirmation']
+    RnfpIntents:
+      type: array
+      default: [{"name":"INVITE","intent":"rnfp.invite"},{"name":"ACCEPT","intent":"rnfp.accept"},{"name":"REJECT","intent":"rnfp.reject"},{"name":"REVOKE","intent":"rnfp.revoke"},{"name":"ANNOUNCE","intent":"rnfp.announce"},{"name":"REQUEST","intent":"rnfp.request"},{"name":"PKG","intent":"rnfp.pkg"}]
+    IacmIntents:
+      type: array
+      default: [{"name":"REQUEST","intent":"iacm.request"},{"name":"URGENT","intent":"iacm.urgent"},{"name":"QUESTION","intent":"iacm.question"},{"name":"PROPOSAL","intent":"iacm.proposal"},{"name":"REPORT","intent":"iacm.report"},{"name":"ANSWER","intent":"iacm.answer"},{"name":"ACCEPT","intent":"iacm.accept"},{"name":"REJECT","intent":"iacm.reject"},{"name":"DEFER","intent":"iacm.defer"},{"name":"ACK","intent":"iacm.ack"},{"name":"FYI","intent":"iacm.fyi"}]
+    McpHorseEnvelope:
+      type: object
+      description: JSON-RPC 2.0 inside HORSE ROOM_MESSAGE
+      properties:
+        jsonrpc: { type: string, const: '2.0' }
+        method: { type: string }
+        params: { type: object }
+        id: { oneOf: [{ type: string }, { type: number }] }

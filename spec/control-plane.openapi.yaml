@@ -1,0 +1,63 @@
+openapi: 3.1.0
+info:
+  title: Zeus Runtime Control Plane
+  version: '1.0.0'
+  description: Bot lifecycle and actor-registry (E4 DS2)
+paths:
+  /bots:
+    post:
+      operationId: startBot
+      summary: Start a role-config bot (rabbit|spider|horse)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role, room]
+              properties:
+                role: { type: string, enum: [rabbit, spider, horse, ping, pong] }
+                room: { type: string }
+                peer: { type: string }
+      responses:
+        '200':
+          description: Bot started
+  /actor-registry:
+    get:
+      operationId: listActorRegistry
+      summary: List per-peer RNFP/IACM actor states
+      responses:
+        '200':
+          description: Registry snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  peers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        peerId: { type: string }
+                        rnfp: { type: string }
+                        iacm: { type: string }
+  /actor-registry/{peerId}:
+    get:
+      operationId: getActorPeer
+      summary: Get actor state for one peer
+      parameters:
+        - name: peerId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Peer actor state
+  /peers:
+    get:
+      operationId: listPeers
+      summary: Rabbit-discovered peers in room
+      responses:
+        '200':
+          description: Peer list
